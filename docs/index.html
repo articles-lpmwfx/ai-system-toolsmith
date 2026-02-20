@@ -1,16 +1,243 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Ai System Toolsmith — Coming Soon</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="lpmwfx, Denmark, EU" />
+  <title>ai-system-toolsmith</title>
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-    <main>
-        <h1>Ai System Toolsmith</h1>
-        <p style="color: var(--muted); font-size: 1.2rem;">Coming soon</p>
-        <p>lpmwfx, Denmark, EU</p>
-    </main>
+<div class="theme-toggle" aria-label="Theme switcher">
+  <button onclick="setTheme('light')" title="Light">&#9788;</button>
+  <button onclick="setTheme('dark')" title="Dark">&#9790;</button>
+  <button onclick="setTheme('system')" title="System">&#9881;</button>
+</div>
+<nav class="article-nav">
+  <a href="https://github.com/articles-lpmwfx/ai-system-toolsmith/releases/latest">&#128196; PDF</a>
+  <a href="https://github.com/articles-lpmwfx/ai-system-toolsmith/blob/main/article/ai-system-toolsmith.md">&#128221; Markdown</a>
+  <a href="SHA256SUMS">&#128274; SHA256</a>
+  <a href="https://github.com/articles-lpmwfx/ai-system-toolsmith">GitHub</a>
+  <a href="https://codeberg.org/Articles-lpmwfx/ai-system-toolsmith">Codeberg</a>
+  <a href="https://codeberg.org/Articles-lpmwfx/ai-system-toolsmith/issues">&#128172; Feedback</a>
+</nav>
+<header id="title-block-header">
+<h1 class="title">ai-system-toolsmith</h1>
+<p class="subtitle">From GUI to Intentional Automation</p>
+<p class="author">lpmwfx, Denmark, EU</p>
+<p class="date">20.02.2026</p>
+</header>
+<h1 id="ai-as-system-toolsmith">AI as System Toolsmith</h1>
+<h2 id="from-gui-to-intentional-automation">From GUI to Intentional
+Automation</h2>
+<p>For decades, graphical user interfaces (GUIs) have been the primary
+way people interact with operating systems. CLI has been for the
+technical, and scripting for the few. With the advent of modern AI
+agents, this is changing fundamentally.</p>
+<p>AI is not just a chatbot or a code generator. It can function as a
+system operator – but more importantly, as a toolsmith.</p>
+<p>This article describes a practical and scalable model for using AI as
+a system helper by automating everything through small, logged,
+idempotent tools.</p>
+<hr />
+<h2 id="the-core-idea-automate-everything">The Core Idea: Automate
+Everything</h2>
+<p>Instead of letting AI directly manipulate the system, we ask AI
+to:</p>
+<ol type="1">
+<li>Write small scripts (Python or JavaScript)</li>
+<li>Place them in a structured service folder</li>
+<li>Execute them with full logging</li>
+<li>Document changes</li>
+</ol>
+<p>The result is a growing local toolbox.</p>
+<p>AI no longer acts “magically.” It produces concrete artifacts.</p>
+<hr />
+<h2 id="the-services-structure">The Services Structure</h2>
+<p>A simple, scalable pattern:</p>
+<pre><code>services/
+  backup/
+  bitwarden/
+  sudo-faceid/
+  audio/</code></pre>
+<p>Each service functions as an isolated domain. Within each service,
+the following structure can be used:</p>
+<pre><code>services/&lt;domain&gt;/
+  tools/
+  conf/
+  data/
+  state/
+  logs/
+  README.md</code></pre>
+<p>This provides:</p>
+<ul>
+<li>Local context</li>
+<li>Isolated change area</li>
+<li>Easy debugging</li>
+<li>Reproducibility</li>
+</ul>
+<hr />
+<h2 id="the-wrapper-architecture">The Wrapper Architecture</h2>
+<p>AI is instructed to build three standard commands for any
+service:</p>
+<ul>
+<li><code>status</code> – Reads system state</li>
+<li><code>apply</code> – Performs changes</li>
+<li><code>logs</code> – Collects relevant logs</li>
+</ul>
+<p>These small wrappers function as adapters between:</p>
+<ul>
+<li>GUI applications</li>
+<li>DBus</li>
+<li>systemd</li>
+<li>Configuration files</li>
+<li>Services without CLI</li>
+</ul>
+<p>The wrapper provides stdio, even if the app never had it.</p>
+<hr />
+<h2 id="why-stdoutstderr-is-central">Why stdout/stderr is Central</h2>
+<p>AI works best when:</p>
+<ul>
+<li>Output is deterministic</li>
+<li>Errors can be parsed</li>
+<li>Status can be verified</li>
+</ul>
+<p>Therefore, all tools should:</p>
+<ul>
+<li>Log everything</li>
+<li>Have <code>--dry-run</code></li>
+<li>Be idempotent</li>
+<li>Write a report after execution</li>
+</ul>
+<p>Example of report content:</p>
+<ul>
+<li>What was changed</li>
+<li>Which files were modified</li>
+<li>Which commands were run</li>
+<li>How to roll back the change</li>
+</ul>
+<hr />
+<h2 id="reversibility-as-a-security-model">Reversibility as a Security
+Model</h2>
+<p>Traditional security focuses on preventing changes.</p>
+<p>This model focuses on:</p>
+<ul>
+<li>Snapshot before change</li>
+<li>Logging during change</li>
+<li>Quick rollback</li>
+</ul>
+<p>When the system is easy to recreate, experimentation becomes possible
+without fear.</p>
+<hr />
+<h2 id="ai-as-toolsmith">AI as Toolsmith</h2>
+<p>The key difference in this model is:</p>
+<p>AI does not just perform tasks.</p>
+<p>AI builds tools.</p>
+<p>Over time, a local ecosystem of small scripts emerges that:</p>
+<ul>
+<li>Can run without AI</li>
+<li>Can be reused</li>
+<li>Can be versioned</li>
+<li>Can be documented</li>
+</ul>
+<p>AI thus becomes an accelerator for system understanding – not a
+replacement.</p>
+<hr />
+<h2 id="scalability">Scalability</h2>
+<p>This approach scales because:</p>
+<ul>
+<li>Each service is isolated</li>
+<li>Tools are small and independent</li>
+<li>No central monolithic agent controls everything</li>
+<li>The system’s truth lies in files</li>
+</ul>
+<p>It resembles DevOps principles applied to personal workstations.</p>
+<hr />
+<h2 id="from-gui-to-intent">From GUI to Intent</h2>
+<p>GUI is about clicks. CLI is about commands.</p>
+<p>AI-based system work is about intentions.</p>
+<p>“Install and configure local Postgres with optimal dev setup and
+document the changes.”</p>
+<p>AI translates the intention into:</p>
+<ul>
+<li>Script</li>
+<li>Logs</li>
+<li>Report</li>
+<li>Verification</li>
+</ul>
+<hr />
+<h2 id="conclusion">Conclusion</h2>
+<p>AI only becomes a real system helper when everything can be done as
+small, logged, idempotent commands – even for applications that were
+never designed for CLI.</p>
+<p>By automating everything and making changes reversible, AI can
+transcend GUI and function as an intentional control layer over the
+operating system.</p>
+<p>It does not require a new operating system.</p>
+<p>It only requires structure, discipline, and a folder called
+services.</p>
+<script type="module">
+  
+
+  function isDark() {
+    const theme = document.documentElement.getAttribute('data-theme');
+    if (theme === 'dark') return true;
+    if (theme === 'light') return false;
+    return window.matchMedia('(prefers-color-scheme: dark)').matches;
+  }
+  
+
+  window.setTheme = function(theme) {
+    if (theme === 'system') {
+      document.documentElement.removeAttribute('data-theme');
+      localStorage.removeItem('theme');
+    } else {
+      document.documentElement.setAttribute('data-theme', theme);
+      localStorage.setItem('theme', theme);
+    }
+    updateToggle();
+    
+  };
+
+  function updateToggle() {
+    const current = localStorage.getItem('theme') || 'system';
+    document.querySelectorAll('.theme-toggle button').forEach((btn, i) => {
+      const themes = ['light', 'dark', 'system'];
+      btn.classList.toggle('active', themes[i] === current);
+    });
+  }
+
+  // Apply saved theme on load
+  const saved = localStorage.getItem('theme');
+  if (saved) document.documentElement.setAttribute('data-theme', saved);
+  updateToggle();
+
+  // Listen for system theme changes
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+    if (!localStorage.getItem('theme')) {
+      
+    }
+  });
+
+  
+</script>
 </body>
 </html>

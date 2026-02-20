@@ -5,37 +5,36 @@ author: "lpmwfx, Denmark, EU"
 date: "20.02.2026"
 lang: en
 ---
+# AI as System Toolsmith
 
-# AI som System-Toolsmith
+## From GUI to Intentional Automation
 
-## Fra GUI til Intentionel Automation
+For decades, graphical user interfaces (GUIs) have been the primary way people interact with operating systems. CLI has been for the technical, and scripting for the few. With the advent of modern AI agents, this is changing fundamentally.
 
-I årtier har grafiske brugerflader (GUI) været den primære måde mennesker interagerer med operativsystemer på. CLI har været for de tekniske, og scripting for de få. Med fremkomsten af moderne AI-agenter ændrer dette sig fundamentalt.
+AI is not just a chatbot or a code generator. It can function as a system operator – but more importantly, as a toolsmith.
 
-AI er ikke blot en chatbot eller en kodegenerator. Den kan fungere som en systemoperatør – men endnu vigtigere: som en toolsmith.
-
-Denne artikel beskriver en praktisk og skalerbar model for at bruge AI som systemhjælper ved at automatisere alt gennem små, loggede, idempotente værktøjer.
-
----
-
-## Grundidéen: Automatisér alt
-
-I stedet for at lade AI direkte manipulere systemet, beder vi AI om at:
-
-1. Skrive små scripts (Python eller JavaScript)
-2. Placere dem i en struktureret service-mappe
-3. Udføre dem med fuld logging
-4. Dokumentere ændringer
-
-Resultatet er en voksende lokal værktøjskasse.
-
-AI handler ikke længere "magisk". Den producerer konkrete artefakter.
+This article describes a practical and scalable model for using AI as a system helper by automating everything through small, logged, idempotent tools.
 
 ---
 
-## Services-strukturen
+## The Core Idea: Automate Everything
 
-Et simpelt, skalerbart mønster:
+Instead of letting AI directly manipulate the system, we ask AI to:
+
+1. Write small scripts (Python or JavaScript)
+2. Place them in a structured service folder
+3. Execute them with full logging
+4. Document changes
+
+The result is a growing local toolbox.
+
+AI no longer acts "magically." It produces concrete artifacts.
+
+---
+
+## The Services Structure
+
+A simple, scalable pattern:
 
 ```
 services/
@@ -45,10 +44,10 @@ services/
   audio/
 ```
 
-Hver service fungerer som et isoleret domæne. Inden for hver service kan følgende struktur anvendes:
+Each service functions as an isolated domain. Within each service, the following structure can be used:
 
 ```
-services/<domæne>/
+services/<domain>/
   tools/
   conf/
   data/
@@ -57,129 +56,129 @@ services/<domæne>/
   README.md
 ```
 
-Dette giver:
+This provides:
 
-- Lokal kontekst
-- Isoleret ændringsområde
-- Let fejlfinding
-- Reproducerbarhed
+- Local context
+- Isolated change area
+- Easy debugging
+- Reproducibility
 
 ---
 
-## Wrapper-arkitekturen
+## The Wrapper Architecture
 
-AI instrueres i at bygge tre standard-kommandoer for enhver service:
+AI is instructed to build three standard commands for any service:
 
-- `status` – Læser systemtilstand
-- `apply` – Udfører ændringer
-- `logs` – Indsamler relevante logs
+- `status` – Reads system state
+- `apply` – Performs changes
+- `logs` – Collects relevant logs
 
-Disse små wrappers fungerer som adaptere mellem:
+These small wrappers function as adapters between:
 
-- GUI-applikationer
+- GUI applications
 - DBus
 - systemd
-- Konfigurationsfiler
-- Services uden CLI
+- Configuration files
+- Services without CLI
 
-Wrapperen giver stdio, selv hvis appen aldrig havde det.
+The wrapper provides stdio, even if the app never had it.
 
 ---
 
-## Hvorfor stdout/stderr er centralt
+## Why stdout/stderr is Central
 
-AI fungerer bedst når:
+AI works best when:
 
-- Output er deterministisk
-- Fejl kan parses
-- Status kan verificeres
+- Output is deterministic
+- Errors can be parsed
+- Status can be verified
 
-Derfor bør alle tools:
+Therefore, all tools should:
 
-- Logge alt
+- Log everything
 - Have `--dry-run`
-- Være idempotente
-- Skrive en rapport efter kørsel
+- Be idempotent
+- Write a report after execution
 
-Eksempel på rapportindhold:
+Example of report content:
 
-- Hvad blev ændret
-- Hvilke filer blev modificeret
-- Hvilke kommandoer blev kørt
-- Hvordan rulles ændringen tilbage
-
----
-
-## Reversibilitet som sikkerhedsmodel
-
-Traditionel sikkerhed fokuserer på at forhindre ændringer.
-
-Denne model fokuserer på:
-
-- Snapshot før ændring
-- Logging under ændring
-- Hurtig rollback
-
-Når systemet er nemt at genskabe, bliver eksperimentering mulig uden frygt.
+- What was changed
+- Which files were modified
+- Which commands were run
+- How to roll back the change
 
 ---
 
-## AI som Toolsmith
+## Reversibility as a Security Model
 
-Den vigtigste forskel i denne model er:
+Traditional security focuses on preventing changes.
 
-AI udfører ikke bare opgaver.
+This model focuses on:
 
-AI bygger værktøjer.
+- Snapshot before change
+- Logging during change
+- Quick rollback
 
-Over tid opstår et lokalt økosystem af små scripts, der:
-
-- Kan køre uden AI
-- Kan genbruges
-- Kan versioneres
-- Kan dokumenteres
-
-AI bliver dermed en accelerator for systemforståelse – ikke en erstatning.
+When the system is easy to recreate, experimentation becomes possible without fear.
 
 ---
 
-## Skalerbarhed
+## AI as Toolsmith
 
-Denne tilgang skalerer fordi:
+The key difference in this model is:
 
-- Hver service er isoleret
-- Værktøjer er små og selvstændige
-- Ingen central monolitisk agent styrer alt
-- Systemets sandhed bor i filer
+AI does not just perform tasks.
 
-Det minder om DevOps-principper anvendt på personlige workstations.
+AI builds tools.
+
+Over time, a local ecosystem of small scripts emerges that:
+
+- Can run without AI
+- Can be reused
+- Can be versioned
+- Can be documented
+
+AI thus becomes an accelerator for system understanding – not a replacement.
 
 ---
 
-## Fra GUI til Intention
+## Scalability
 
-GUI handler om klik.
-CLI handler om kommandoer.
+This approach scales because:
 
-AI-baseret systemarbejde handler om intentioner.
+- Each service is isolated
+- Tools are small and independent
+- No central monolithic agent controls everything
+- The system's truth lies in files
 
-"Installer og konfigurer lokal Postgres med optimal dev-setup og dokumentér ændringerne."
+It resembles DevOps principles applied to personal workstations.
 
-AI oversætter intentionen til:
+---
+
+## From GUI to Intent
+
+GUI is about clicks.
+CLI is about commands.
+
+AI-based system work is about intentions.
+
+"Install and configure local Postgres with optimal dev setup and document the changes."
+
+AI translates the intention into:
 
 - Script
 - Logs
-- Rapport
-- Verifikation
+- Report
+- Verification
 
 ---
 
-## Konklusion
+## Conclusion
 
-AI bliver først en reel systemhjælper, når alt kan gøres som små, loggede, idempotente kommandoer – også for applikationer der aldrig var designet til CLI.
+AI only becomes a real system helper when everything can be done as small, logged, idempotent commands – even for applications that were never designed for CLI.
 
-Ved at automatisere alt og gøre ændringer reversible, kan AI transcendere GUI og fungere som et intentionelt kontrol-lag over operativsystemet.
+By automating everything and making changes reversible, AI can transcend GUI and function as an intentional control layer over the operating system.
 
-Det kræver ikke et nyt operativsystem.
+It does not require a new operating system.
 
-Det kræver blot struktur, disciplin og en mappe kaldet services.
+It only requires structure, discipline, and a folder called services.
